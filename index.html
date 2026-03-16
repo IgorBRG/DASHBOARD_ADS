@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ads Dashboard V3 (Cloud)</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    
+    <!-- ====== START: NOT CONFIGURED BANNER ====== -->
+    <div id="firebase-warning" class="firebase-warning hidden">
+        <div class="warning-content">
+            <i class="ph ph-warning-octagon"></i>
+            <div>
+                <strong>Firebase Não Configurado!</strong>
+                <p>Abra o arquivo <code>firebase-config.js</code> e cole as chaves do seu projeto para salvar na nuvem.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ====== START: AUTHENTICATION MODULE ====== -->
+    <div id="auth-container" class="auth-container">
+        <div class="auth-card">
+            <div class="auth-logo">
+                <i class="ph ph-trend-up"></i>
+                <span>AdsDash Cloud</span>
+            </div>
+            
+            <p class="auth-subtitle">Entre ou crie uma conta para salvar suas campanhas na nuvem com segurança.</p>
+            
+            <form id="auth-form">
+                <div class="form-group p-0 mb-16">
+                    <label for="auth-email">E-mail</label>
+                    <input type="email" id="auth-email" placeholder="seu@email.com" required>
+                </div>
+                <div class="form-group p-0 mb-16">
+                    <label for="auth-password">Senha</label>
+                    <input type="password" id="auth-password" placeholder="Mínimo 6 caracteres" required minlength="6">
+                </div>
+                
+                <div class="auth-actions">
+                    <button type="submit" class="btn btn-primary" id="btn-login" style="width: 100%;">Entrar</button>
+                    <button type="button" class="btn btn-outline" id="btn-register" style="width: 100%; margin-top: 12px;">Criar Conta</button>
+                </div>
+                <div id="auth-error" class="auth-error hidden"></div>
+            </form>
+        </div>
+    </div>
+    <!-- ====== END: AUTHENTICATION MODULE ====== -->
+
+    <!-- ====== START: MAIN APP ====== -->
+    <div id="app-container" class="app-container hidden">
+        <!-- Sidebar / Navigation -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="ph ph-trend-up"></i>
+                <span>AdsDash</span>
+            </div>
+            <nav class="nav-menu">
+                <a href="#" class="nav-link active" id="nav-dashboard"><i class="ph ph-squares-four"></i> Visão Geral</a>
+                <a href="#" class="nav-link" id="nav-campaigns"><i class="ph ph-folder-star"></i> Campanhas <span class="badge badge-primary total-campaigns-badge">0</span></a>
+                <a href="#" class="nav-link"><i class="ph ph-gear"></i> Configurações</a>
+            </nav>
+            <div class="user-profile">
+                <div class="avatar"><i class="ph ph-user"></i></div>
+                <div class="user-info" style="flex: 1;">
+                    <span class="user-name" id="user-display-email">Usuário</span>
+                    <span class="user-role">Conectado na Nuvem</span>
+                </div>
+                <button class="btn-icon" id="btn-logout" title="Sair da Conta"><i class="ph ph-sign-out"></i></button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            
+            <!-- ====== VIEW: GLOBAL DASHBOARD ====== -->
+            <div id="view-dashboard" class="view-section active">
+                <header class="top-header">
+                    <div>
+                        <h1 class="page-title">Visão Consolidada</h1>
+                        <p class="page-subtitle">Desempenho total de todas as suas campanhas combinadas.</p>
+                    </div>
+                </header>
+
+                <!-- Summary Cards (Global) -->
+                <section class="summary-cards">
+                    <div class="card summary-card">
+                        <div class="card-icon blue"><i class="ph ph-money"></i></div>
+                        <div class="card-details">
+                            <span class="card-label">Total Gasto (Geral)</span>
+                            <h2 class="card-value" id="global-val-gasto">R$ 0,00</h2>
+                        </div>
+                    </div>
+                    <div class="card summary-card">
+                        <div class="card-icon green"><i class="ph ph-shopping-cart"></i></div>
+                        <div class="card-details">
+                            <span class="card-label">Vendas Totais</span>
+                            <h2 class="card-value" id="global-val-vendas">0</h2>
+                        </div>
+                    </div>
+                    <div class="card summary-card">
+                        <div class="card-icon purple"><i class="ph ph-wallet"></i></div>
+                        <div class="card-details">
+                            <span class="card-label">Faturamento Total</span>
+                            <h2 class="card-value" id="global-val-faturamento">R$ 0,00</h2>
+                        </div>
+                    </div>
+                    <!-- NEW METRIC: Lucro Mensal -->
+                    <div class="card summary-card">
+                        <div class="card-icon teal"><i class="ph ph-chart-line-up"></i></div>
+                        <div class="card-details">
+                            <span class="card-label">Lucro do Mês Atual</span>
+                            <h2 class="card-value" id="global-val-lucro">R$ 0,00</h2>
+                        </div>
+                    </div>
+                    <div class="card summary-card">
+                        <div class="card-icon orange"><i class="ph ph-chart-polar"></i></div>
+                        <div class="card-details">
+                            <span class="card-label">ROAS Médio (Geral)</span>
+                            <h2 class="card-value" id="global-val-roas">0.00x</h2>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Recent Campaigns Table -->
+                <section class="table-area">
+                    <div class="card table-card">
+                        <div class="card-header table-header-flex">
+                            <h3>Minhas Campanhas (Resumo)</h3>
+                            <button class="btn btn-secondary btn-sm" id="btn-goto-campaigns">Ver Todas</button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Nome da Campanha</th>
+                                        <th>Gasto Acumulado</th>
+                                        <th>Faturamento</th>
+                                        <th>Lucro (Geral)</th>
+                                        <th>ROAS</th>
+                                        <th>Ação</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="global-campaigns-table">
+                                    <!-- Populated via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="global-empty-state" class="empty-state hidden">
+                            <div class="empty-icon"><i class="ph ph-folder-open"></i></div>
+                            <p>Nenhuma campanha criada ainda. Vá para o menu Campanhas para começar.</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- ====== VIEW: CAMPAIGNS LIST ====== -->
+            <div id="view-campaigns" class="view-section hidden">
+                <header class="top-header">
+                    <div>
+                        <h1 class="page-title">Gerenciar Campanhas</h1>
+                        <p class="page-subtitle">Crie projetos e acompanhe seus resultados individualmente.</p>
+                    </div>
+                    <button class="btn btn-primary" id="btn-create-campaign">
+                        <i class="ph ph-folder-plus"></i> Nova Campanha
+                    </button>
+                </header>
+
+                <div class="campaign-grid" id="campaign-cards-container">
+                    <!-- Cards de campanhas renderizados via JS -->
+                </div>
+                
+                <div id="campaigns-empty-state" class="empty-state hidden">
+                    <div class="empty-icon"><i class="ph ph-folder-dashed"></i></div>
+                    <p>Você não possui projetos de campanha. Crie um para registrar gastos diários.</p>
+                    <button class="btn btn-secondary btn-sm" id="btn-add-empty-campaign">Criar Primeira Campanha</button>
+                </div>
+            </div>
+
+            <!-- ====== VIEW: INDIVIDUAL CAMPAIGN DASHBOARD ====== -->
+            <div id="view-campaign-detail" class="view-section hidden">
+                <header class="top-header">
+                    <div class="header-with-back">
+                        <button class="btn-icon back-btn" id="btn-back-campaigns" title="Voltar"><i class="ph ph-arrow-left"></i></button>
+                        <div>
+                            <div class="badge-wrapper">
+                                <h1 class="page-title" id="detail-campaign-name">Nome da Campanha</h1>
+                                <span class="badge badge-success">Ativa</span>
+                            </div>
+                            <p class="page-subtitle">Resultados detalhados desta campanha específica.</p>
+                        </div>
+                    </div>
+                    <div class="header-actions">
+                        <button class="btn btn-outline" id="btn-edit-campaign-name">
+                            <i class="ph ph-pencil-simple"></i> Renomear
+                        </button>
+                        <button class="btn btn-primary" id="btn-add-daily-record">
+                            <i class="ph ph-calendar-plus"></i> Registrar Dia
+                        </button>
+                    </div>
+                </header>
+
+                <!-- Summary Cards (Individual) -->
+                <section class="summary-cards">
+                    <div class="card summary-card">
+                        <div class="card-icon blue"><i class="ph ph-money"></i></div>
+                        <div class="card-details">
+                            <span class="card-label">Gasto (Campanha)</span>
+                            <h2 class="card-value" id="detail-val-gasto">R$ 0,00</h2>
+                        </div>
+                    </div>
+                    <div class="card summary-card">
+                        <div class="card-icon green"><i class="ph ph-shopping-cart"></i></div>
+                        <div class="card-details">
+                            <span class="card-label">Vendas (Campanha)</span>
+                            <h2 class="card-value" id="detail-val-vendas">0</h2>
+                        </div>
+                    </div>
+                    <div class="card summary-card">
+                        <div class="card-icon purple"><i class="ph ph-wallet"></i></div>
+                        <div class="card-details">
+                            <span class="card-label">Faturamento (Campanha)</span>
+                            <h2 class="card-value" id="detail-val-faturamento">R$ 0,00</h2>
+                        </div>
+                    </div>
+
+                    <div class="card summary-card">
+                        <div class="card-icon teal"><i class="ph ph-chart-line-up"></i></div>
+                        <div class="card-details">
+                            <span class="card-label">Lucro (Campanha)</span>
+                            <h2 class="card-value" id="detail-val-lucro">R$ 0,00</h2>
+                        </div>
+                    </div>
+                    <div class="card summary-card">
+                        <div class="card-icon orange"><i class="ph ph-chart-polar"></i></div>
+                        <div class="card-details">
+                            <span class="card-label">ROAS Atual</span>
+                            <h2 class="card-value" id="detail-val-roas">0.00x</h2>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Charts Area (Individual) -->
+                <section class="charts-area">
+                    <div class="card chart-card">
+                        <div class="card-header">
+                            <h3>Evolução Diária (Faturamento vs Gasto)</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="detailRevenueChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="card chart-card">
+                        <div class="card-header">
+                            <h3>ROAS por Dia</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="detailRoasChart"></canvas>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Daily Records Table -->
+                <section class="table-area">
+                    <div class="card table-card">
+                        <div class="card-header table-header-flex">
+                            <h3>Registros Diários</h3>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Data do Registro</th>
+                                        <th>Valor Gasto (Dia)</th>
+                                        <th>Qtd. Vendas (Dia)</th>
+                                        <th>Faturamento (Dia)</th>
+                                        <th>ROAS (Diário)</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="detail-records-table">
+                                    <!-- Data will be dynamically injected here -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="detail-empty-state" class="empty-state hidden">
+                            <div class="empty-icon"><i class="ph ph-calendar-blank"></i></div>
+                            <p>Nenhum dia registrado nesta campanha. Adicione o primeiro dia para ver os gráficos.</p>
+                            <button class="btn btn-secondary btn-sm" id="btn-add-first-record">Registrar Hoje</button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+        </main>
+    </div>
+
+    <div class="modal-overlay hidden" id="modal-campaign">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-campaign-title">Nova Campanha</h2>
+                <button class="btn-close" id="btn-close-modal-campaign"><i class="ph ph-x"></i></button>
+            </div>
+            <form id="form-campaign">
+                <input type="hidden" id="form-campaign-id">
+                <div class="form-group p-24 pb-0">
+                    <label for="form-campaign-name">Nome da Campanha / Projeto</label>
+                    <input type="text" id="form-campaign-name" placeholder="Ex: Lançamento Produto X" required>
+                </div>
+                <div class="modal-footer p-24-sides pb-24">
+                    <button type="button" class="btn btn-outline" id="btn-cancel-campaign">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="btn-save-campaign">Salvar Campanha</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Create/Edit Daily Record -->
+    <div class="modal-overlay hidden" id="modal-record">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modal-record-title">Registrar Desempenho do Dia</h2>
+                <button class="btn-close" id="btn-close-modal-record"><i class="ph ph-x"></i></button>
+            </div>
+            <form id="form-record">
+                <input type="hidden" id="form-record-id">
+                
+                <div class="form-row p-24 pb-0">
+                    <div class="form-group mb-0">
+                        <label for="record-date">Data do Registro</label>
+                        <input type="date" id="record-date" required>
+                    </div>
+                    <div class="form-group mb-0">
+                        <label for="record-spend">Valor Gasto no Dia (R$)</label>
+                        <input type="number" id="record-spend" step="0.01" min="0" placeholder="0.00" required>
+                    </div>
+                </div>
+                
+                <div class="form-row p-24 pt-16 pb-0">
+                    <div class="form-group mb-0">
+                        <label for="record-sales">Qtd Vendas no Dia</label>
+                        <input type="number" id="record-sales" step="1" min="0" placeholder="0" required>
+                    </div>
+                    <div class="form-group mb-0">
+                        <label for="record-revenue">Faturamento no Dia (R$)</label>
+                        <input type="number" id="record-revenue" step="0.01" min="0" placeholder="0.00" required>
+                    </div>
+                </div>
+                
+                <div class="modal-footer p-24-sides pb-24">
+                    <button type="button" class="btn btn-outline" id="btn-cancel-record">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="btn-save-record">Salvar Registro</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Delete Confirmation -->
+    <div class="modal-overlay hidden" id="modal-delete">
+        <div class="modal-content delete-modal-content">
+            <div class="delete-icon"><i class="ph ph-warning-circle"></i></div>
+            <h2 id="delete-title">Excluir?</h2>
+            <p id="delete-msg">Tem certeza que deseja excluir? Esta ação não pode ser desfeita.</p>
+            <input type="hidden" id="delete-target-id">
+            <input type="hidden" id="delete-type"> <!-- 'campaign' ou 'record' -->
+            <div class="modal-footer justify-center">
+                <button type="button" class="btn btn-outline" id="btn-cancel-delete">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="btn-confirm-delete">Sim, Excluir</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="global-loader hidden" id="global-loader">
+        <div class="spinner"><i class="ph ph-spinner-gap"></i></div>
+        <p>Carregando dados da nuvem...</p>
+    </div>
+
+    <!-- JS (Main logic is type="module" because of Firebase v10) -->
+    <script type="module" src="script.js"></script>
+</body>
+</html>
