@@ -89,10 +89,7 @@ Devido às restrições de segurança (CORS) de módulos JavaScript modernos e d
 
 ---
 
-## 🤝 Vercel Deploy
 
-A aplicação está arquitetada para ser "Serverless" focada inteiramente no Frontend consumindo serviços de terceiros, o que significa que o Deploy para o Vercel é literalmente apertar um botão e apontar para esse repositório no GitHub. Nenhuma configuração extra de variável de ambiente (Build Settings) é necessária na plataforma para o MVP nativo.
 
----
 
 > Projeto desenvolvido por design intencional sem a utilização de frameworks genéricos para a interface, visando flexibilidade máxima e estética apurada.
