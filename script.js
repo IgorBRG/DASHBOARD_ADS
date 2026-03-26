@@ -39,7 +39,26 @@ const formatDateBR = (dateStr) => {
 document.addEventListener('DOMContentLoaded', () => {
     checkFirebaseSettings();
     setupAuthUI();
+    setupSidebarToggle();
 });
+
+function setupSidebarToggle() {
+    const btnToggle = document.getElementById('btn-toggle-sidebar');
+    const sidebar = document.getElementById('sidebar');
+    
+    if (btnToggle && sidebar) {
+        btnToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            
+            // Resize charts after transition to fit new space
+            setTimeout(() => {
+                if (detailRevenueChartInstance) detailRevenueChartInstance.resize();
+                if (detailRoasChartInstance) detailRoasChartInstance.resize();
+                if (detailCpaChartInstance) detailCpaChartInstance.resize();
+            }, 300);
+        });
+    }
+}
 
 function checkFirebaseSettings() {
     if (firebaseConfig.apiKey && firebaseConfig.apiKey !== "SUA_API_KEY_AQUI") {

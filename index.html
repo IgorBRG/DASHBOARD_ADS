@@ -61,15 +61,25 @@
     <!-- ====== START: MAIN APP ====== -->
     <div id="app-container" class="app-container hidden">
         <!-- Sidebar / Navigation -->
-        <aside class="sidebar">
+        <aside class="sidebar" id="sidebar">
             <div class="logo">
-                <i class="ph ph-trend-up"></i>
-                <span>AdsDash</span>
+                <div class="logo-text">
+                    <i class="ph ph-trend-up"></i>
+                    <span>AdsDash</span>
+                </div>
+                <button class="btn-icon sidebar-toggle" id="btn-toggle-sidebar" title="Recolher Menu"><i class="ph ph-list"></i></button>
             </div>
             <nav class="nav-menu">
-                <a href="#" class="nav-link active" id="nav-dashboard"><i class="ph ph-squares-four"></i> Visão Geral</a>
-                <a href="#" class="nav-link" id="nav-campaigns"><i class="ph ph-folder-star"></i> Campanhas <span class="badge badge-primary total-campaigns-badge">0</span></a>
-                <a href="#" class="nav-link"><i class="ph ph-gear"></i> Configurações</a>
+                <a href="#" class="nav-link active" id="nav-dashboard">
+                    <div style="display: flex; align-items: center;"><i class="ph ph-squares-four"></i> <span class="nav-text">Visão Geral</span></div>
+                </a>
+                <a href="#" class="nav-link" id="nav-campaigns">
+                    <div style="display: flex; align-items: center;"><i class="ph ph-folder-star"></i> <span class="nav-text">Campanhas</span></div>
+                    <span class="badge badge-primary total-campaigns-badge">0</span>
+                </a>
+                <a href="#" class="nav-link">
+                    <div style="display: flex; align-items: center;"><i class="ph ph-gear"></i> <span class="nav-text">Configurações</span></div>
+                </a>
             </nav>
             <div class="user-profile">
                 <div class="avatar"><i class="ph ph-user"></i></div>
@@ -80,6 +90,7 @@
                 <button class="btn-icon" id="btn-logout" title="Sair da Conta"><i class="ph ph-sign-out"></i></button>
             </div>
         </aside>
+
 
         <!-- Main Content -->
         <main class="main-content">
