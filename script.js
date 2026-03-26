@@ -207,9 +207,10 @@ function calculateAggregates(recordsArr) {
     });
     
     const roas = totalSpend > 0 ? (totalRevenue / totalSpend) : 0;
+    const cpa = totalSales > 0 ? (totalSpend / totalSales) : 0;
     
     return { 
-        totalSpend, totalSales, totalRevenue, roas, monthlyProfit 
+        totalSpend, totalSales, totalRevenue, roas, cpa, monthlyProfit 
     };
 }
 
@@ -222,6 +223,7 @@ function renderGlobalDashboard() {
     document.getElementById('global-val-faturamento').textContent = formatCurrency(agg.totalRevenue);
     document.getElementById('global-val-lucro').textContent = formatCurrency(agg.monthlyProfit);
     document.getElementById('global-val-roas').textContent = agg.roas.toFixed(2) + 'x';
+    document.getElementById('global-val-cpa').textContent = formatCurrency(agg.cpa);
     
     // Lucro color adjust
     const globalLucroEl = document.getElementById('global-val-lucro');
@@ -256,6 +258,7 @@ function renderGlobalDashboard() {
                 <td>${formatCurrency(cAgg.totalRevenue)}</td>
                 <td style="${profitColor}; font-weight:600">${formatCurrency(totalProfit)}</td>
                 <td><span class="badge ${cAgg.roas >= 2 ? 'badge-success' : (cAgg.roas > 1 ? 'badge-warning' : 'badge-danger')}">${cAgg.roas.toFixed(2)}x</span></td>
+                <td>${formatCurrency(cAgg.cpa)}</td>
                 <td>
                     <button class="btn-icon" title="Ver Detalhes" onclick="openCampaignDetail('${camp.id}')"><i class="ph ph-arrow-right"></i></button>
                     <button class="btn-icon delete-btn" title="Excluir" onclick="promptDelete('campaign', '${camp.id}')"><i class="ph ph-trash"></i></button>
@@ -302,6 +305,10 @@ function renderCampaignsList() {
                         <span class="stat-label">ROAS</span>
                         <span class="stat-value" style="color: ${cAgg.roas >= 2 ? 'var(--accent-green)' : 'inherit'}">${cAgg.roas.toFixed(2)}x</span>
                     </div>
+                    <div class="stat-item">
+                        <span class="stat-label">CPA</span>
+                        <span class="stat-value">${formatCurrency(cAgg.cpa)}</span>
+                    </div>
                 </div>
             `;
             container.appendChild(card);
@@ -323,6 +330,7 @@ function renderCampaignDetail() {
     document.getElementById('detail-val-faturamento').textContent = formatCurrency(agg.totalRevenue);
     document.getElementById('detail-val-lucro').textContent = formatCurrency(agg.monthlyProfit);
     document.getElementById('detail-val-roas').textContent = agg.roas.toFixed(2) + 'x';
+    document.getElementById('detail-val-cpa').textContent = formatCurrency(agg.cpa);
 
     // Lucro color adjust
     const detailLucroEl = document.getElementById('detail-val-lucro');
@@ -345,6 +353,7 @@ function renderCampaignDetail() {
         chartsArea.style.display = 'grid';
         
         cRecs.forEach(r => {
+            const diaroCpa = r.sales > 0 ? (r.spend / r.sales) : 0;
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td><strong>${formatDateBR(r.date)}</strong></td>
@@ -352,6 +361,7 @@ function renderCampaignDetail() {
                 <td>${r.sales}</td>
                 <td style="color: var(--accent-green)">${formatCurrency(r.revenue)}</td>
                 <td><span class="badge ${r.roas >= 2 ? 'badge-success' : (r.roas > 1 ? 'badge-warning' : 'badge-danger')}">${r.roas.toFixed(2)}x</span></td>
+                <td>${formatCurrency(diaroCpa)}</td>
                 <td>
                     <button class="btn-icon edit-btn" title="Editar" onclick='openModalRecord(${JSON.stringify(r)})'><i class="ph ph-pencil-simple"></i></button>
                     <button class="btn-icon delete-btn" title="Excluir" onclick="promptDelete('record', '${r.id}')"><i class="ph ph-trash"></i></button>
