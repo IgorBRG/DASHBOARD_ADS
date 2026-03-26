@@ -20,6 +20,7 @@
     --accent-purple: #8b5cf6;
     --accent-orange: #f59e0b;
     --accent-teal: #14b8a6; /* Nova cor para Lucro */
+    --accent-indigo: #6366f1;
     
     --glass-blur: blur(16px);
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
@@ -139,7 +140,7 @@ body {
 .card-icon.purple { background-color: rgba(139, 92, 246, 0.15); color: var(--accent-purple); }
 .card-icon.orange { background-color: rgba(245, 158, 11, 0.15); color: var(--accent-orange); }
 .card-icon.teal { background-color: rgba(20, 184, 166, 0.15); color: var(--accent-teal); }
-.card-icon.red { background-color: rgba(239, 68, 68, 0.15); color: var(--accent-red); }
+.card-icon.indigo { background-color: rgba(99, 102, 241, 0.15); color: var(--accent-indigo); }
 .card-details { display: flex; flex-direction: column; overflow: hidden; }
 .card-label { font-size: 13px; color: var(--text-secondary); font-weight: 500; margin-bottom: 4px; white-space: nowrap; }
 .card-value { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; word-break: break-word; }
@@ -153,7 +154,7 @@ body {
 .campaign-card-date { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
 .campaign-actions-abs { position: absolute; top: 20px; right: 20px; display: none; background: var(--bg-main); border-radius: var(--radius-md); border: 1px solid var(--border-color); padding: 4px; z-index: 2; }
 .campaign-card:hover .campaign-actions-abs { display: flex; }
-.campaign-card-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border-color); }
+.campaign-card-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: auto; padding-top: 16px; border-top: 1px solid var(--border-color); }
 .stat-item { display: flex; flex-direction: column; }
 .stat-label { font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; }
 .stat-value { font-size: 18px; font-weight: 700; color: var(--text-primary); }

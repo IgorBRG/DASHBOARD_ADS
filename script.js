@@ -210,7 +210,7 @@ function calculateAggregates(recordsArr) {
     const cpa = totalSales > 0 ? (totalSpend / totalSales) : 0;
     
     return { 
-        totalSpend, totalSales, totalRevenue, roas, cpa, monthlyProfit 
+        totalSpend, totalSales, totalRevenue, roas, monthlyProfit, cpa 
     };
 }
 
@@ -353,7 +353,7 @@ function renderCampaignDetail() {
         chartsArea.style.display = 'grid';
         
         cRecs.forEach(r => {
-            const diaroCpa = r.sales > 0 ? (r.spend / r.sales) : 0;
+            const rCpa = r.sales > 0 ? (r.spend / r.sales) : 0;
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td><strong>${formatDateBR(r.date)}</strong></td>
@@ -361,7 +361,7 @@ function renderCampaignDetail() {
                 <td>${r.sales}</td>
                 <td style="color: var(--accent-green)">${formatCurrency(r.revenue)}</td>
                 <td><span class="badge ${r.roas >= 2 ? 'badge-success' : (r.roas > 1 ? 'badge-warning' : 'badge-danger')}">${r.roas.toFixed(2)}x</span></td>
-                <td>${formatCurrency(diaroCpa)}</td>
+                <td>${formatCurrency(rCpa)}</td>
                 <td>
                     <button class="btn-icon edit-btn" title="Editar" onclick='openModalRecord(${JSON.stringify(r)})'><i class="ph ph-pencil-simple"></i></button>
                     <button class="btn-icon delete-btn" title="Excluir" onclick="promptDelete('record', '${r.id}')"><i class="ph ph-trash"></i></button>
@@ -490,11 +490,12 @@ function setupModals() {
         const sales = parseInt(document.getElementById('record-sales').value);
         const revenue = parseFloat(document.getElementById('record-revenue').value);
         const roas = spend > 0 ? (revenue / spend) : 0;
+        const cpa = sales > 0 ? (spend / sales) : 0;
 
         const recordData = { 
             campaignId: activeCampaignId, 
             userId: currentUser.uid,
-            date, spend, sales, revenue, roas 
+            date, spend, sales, revenue, roas, cpa 
         };
 
         const btnSave = document.getElementById('btn-save-record');
