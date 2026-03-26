@@ -18,6 +18,7 @@ let currentView = 'dashboard';
 let activeCampaignId = null;
 let detailRevenueChartInstance = null;
 let detailRoasChartInstance = null;
+let detailCpaChartInstance = null;
 
 // Firebase Globals
 let app, auth, db;
@@ -587,6 +588,7 @@ function updateCharts(records) {
     const revenueData = sortedDesc.map(r => r.revenue);
     const spendData = sortedDesc.map(r => r.spend);
     const roasData = sortedDesc.map(r => r.roas);
+    const cpaData = sortedDesc.map(r => r.sales > 0 ? (r.spend / r.sales) : 0);
 
     // Common Chart Options
     const commonOptions = {
@@ -631,6 +633,26 @@ function updateCharts(records) {
             labels,
             datasets: [{
                 label: 'ROAS', data: roasData, backgroundColor: '#f59e0b', borderRadius: 6
+            }]
+        },
+        options: commonOptions
+    });
+
+    // CPA Chart
+    const ctxCpa = document.getElementById('detailCpaChart').getContext('2d');
+    if (detailCpaChartInstance) detailCpaChartInstance.destroy();
+    
+    // Gradient definitions for CPA
+    const gradientCpa = ctxCpa.createLinearGradient(0, 0, 0, 400);
+    gradientCpa.addColorStop(0, 'rgba(99, 102, 241, 0.5)'); // Indigo
+    gradientCpa.addColorStop(1, 'rgba(99, 102, 241, 0.0)');
+
+    detailCpaChartInstance = new Chart(ctxCpa, {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [{
+                label: 'CPA (R$)', data: cpaData, borderColor: '#6366f1', backgroundColor: gradientCpa, borderWidth: 3, tension: 0.4, fill: true, pointBackgroundColor: '#6366f1'
             }]
         },
         options: commonOptions

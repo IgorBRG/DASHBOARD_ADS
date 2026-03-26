@@ -160,7 +160,7 @@ body {
 .stat-value { font-size: 18px; font-weight: 700; color: var(--text-primary); }
 
 /* Charts Area */
-.charts-area { display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 32px; }
+.charts-area { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 24px; margin-bottom: 32px; }
 .chart-card .card-header { margin-bottom: 20px; }
 .chart-card h3 { font-size: 16px; font-weight: 600; color: var(--text-primary); }
 .chart-container { position: relative; height: 280px; width: 100%; }
