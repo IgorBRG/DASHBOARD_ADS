@@ -98,9 +98,28 @@
             <!-- ====== VIEW: GLOBAL DASHBOARD ====== -->
             <div id="view-dashboard" class="view-section active">
                 <header class="top-header">
-                    <div>
+                    <div style="flex: 1; min-width: 250px;">
                         <h1 class="page-title">Visão Consolidada</h1>
                         <p class="page-subtitle">Desempenho total de todas as suas campanhas combinadas.</p>
+                    </div>
+                    <!-- Date Filter -->
+                    <div class="date-filter-container" style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                        <span style="color: var(--text-secondary); font-size: 13px;">Período:</span>
+                        <select id="global-date-preset" style="height: 36px; padding: 0 12px; background-color: var(--bg-surface-hover); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: var(--radius-md); font-family: inherit; font-size: 13px; cursor: pointer;">
+                            <option value="today">Hoje</option>
+                            <option value="yesterday">Ontem</option>
+                            <option value="last7">Últimos 7 dias</option>
+                            <option value="thisMonth" selected>Este Mês</option>
+                            <option value="lastMonth">Mês Passado</option>
+                            <option value="all">Todo o Período</option>
+                            <option value="custom">Personalizado</option>
+                        </select>
+                        <div id="custom-date-fields" class="hidden" style="display: flex; gap: 8px; align-items: center;">
+                            <input type="date" id="global-date-start" style="height: 36px; padding: 0 8px;">
+                            <span style="color: var(--text-secondary); font-size: 13px;">até</span>
+                            <input type="date" id="global-date-end" style="height: 36px; padding: 0 8px;">
+                            <button id="btn-apply-date-filter" class="btn btn-primary btn-sm" style="height: 36px;">OK</button>
+                        </div>
                     </div>
                 </header>
 
@@ -131,7 +150,7 @@
                     <div class="card summary-card">
                         <div class="card-icon teal"><i class="ph ph-chart-line-up"></i></div>
                         <div class="card-details">
-                            <span class="card-label">Lucro do Mês Atual</span>
+                            <span class="card-label">Lucro (Período)</span>
                             <h2 class="card-value" id="global-val-lucro">R$ 0,00</h2>
                         </div>
                     </div>

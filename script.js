@@ -20,6 +20,10 @@ let detailRevenueChartInstance = null;
 let detailRoasChartInstance = null;
 let detailCpaChartInstance = null;
 
+let globalDatePreset = 'thisMonth';
+let globalDateStart = '';
+let globalDateEnd = '';
+
 // Firebase Globals
 let app, auth, db;
 let currentUser = null;
@@ -40,7 +44,84 @@ document.addEventListener('DOMContentLoaded', () => {
     checkFirebaseSettings();
     setupAuthUI();
     setupSidebarToggle();
+    setupGlobalDateFilter();
 });
+
+function setupGlobalDateFilter() {
+    const presetSelect = document.getElementById('global-date-preset');
+    const customFields = document.getElementById('custom-date-fields');
+    const btnApply = document.getElementById('btn-apply-date-filter');
+    const startInput = document.getElementById('global-date-start');
+    const endInput = document.getElementById('global-date-end');
+
+    if (!presetSelect) return;
+
+    presetSelect.addEventListener('change', (e) => {
+        globalDatePreset = e.target.value;
+        if (globalDatePreset === 'custom') {
+            customFields.classList.remove('hidden');
+        } else {
+            customFields.classList.add('hidden');
+            renderGlobalDashboard();
+        }
+    });
+
+    btnApply.addEventListener('click', () => {
+        if (startInput.value || endInput.value) {
+            globalDateStart = startInput.value;
+            globalDateEnd = endInput.value;
+            renderGlobalDashboard();
+        }
+    });
+
+    const now = new Date();
+    startInput.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
+    endInput.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()).padStart(2, '0')}`;
+}
+
+function getLocalDateString(d) {
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function filterRecordsByGlobalDate(records) {
+    if (globalDatePreset === 'all') return records;
+    
+    const now = new Date();
+    let startStr = '';
+    let endStr = '';
+
+    if (globalDatePreset === 'custom') {
+        startStr = globalDateStart;
+        endStr = globalDateEnd;
+    } else {
+        const todayStr = getLocalDateString(now);
+        if (globalDatePreset === 'today') {
+            startStr = todayStr; endStr = todayStr;
+        } else if (globalDatePreset === 'yesterday') {
+            const yest = new Date(now); yest.setDate(yest.getDate() - 1);
+            startStr = getLocalDateString(yest); endStr = getLocalDateString(yest);
+        } else if (globalDatePreset === 'last7') {
+            const last7 = new Date(now); last7.setDate(last7.getDate() - 6);
+            startStr = getLocalDateString(last7); endStr = todayStr;
+        } else if (globalDatePreset === 'thisMonth') {
+            const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
+            startStr = getLocalDateString(firstDay);
+            const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+            endStr = getLocalDateString(lastDay);
+        } else if (globalDatePreset === 'lastMonth') {
+            const firstDay = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+            startStr = getLocalDateString(firstDay);
+            const lastDay = new Date(now.getFullYear(), now.getMonth(), 0);
+            endStr = getLocalDateString(lastDay);
+        }
+    }
+
+    return records.filter(r => {
+        if (startStr && r.date < startStr) return false;
+        if (endStr && r.date > endStr) return false;
+        return true;
+    });
+}
 
 function setupSidebarToggle() {
     const btnToggle = document.getElementById('btn-toggle-sidebar');
@@ -209,21 +290,12 @@ function initDashboard() {
 // --- Aggregation & Math ---
 function calculateAggregates(recordsArr) {
     let totalSpend = 0, totalSales = 0, totalRevenue = 0, monthlyProfit = 0;
-    
-    const now = new Date();
-    const currentMonth = now.getMonth();
-    const currentYear = now.getFullYear();
 
     recordsArr.forEach(r => {
         totalSpend += r.spend;
         totalSales += r.sales;
         totalRevenue += r.revenue;
-        
-        // Parse yyyy-mm-dd safely
-        const rDate = new Date(r.date + "T00:00:00"); 
-        if (rDate.getMonth() === currentMonth && rDate.getFullYear() === currentYear) {
-            monthlyProfit += (r.revenue - r.spend);
-        }
+        monthlyProfit += (r.revenue - r.spend);
     });
     
     const roas = totalSpend > 0 ? (totalRevenue / totalSpend) : 0;
@@ -236,7 +308,8 @@ function calculateAggregates(recordsArr) {
 
 // --- Render Views ---
 function renderGlobalDashboard() {
-    const agg = calculateAggregates(state.records);
+    const filteredRecords = filterRecordsByGlobalDate(state.records);
+    const agg = calculateAggregates(filteredRecords);
     
     document.getElementById('global-val-gasto').textContent = formatCurrency(agg.totalSpend);
     document.getElementById('global-val-vendas').textContent = formatNumber(agg.totalSales);
@@ -265,7 +338,7 @@ function renderGlobalDashboard() {
         // Render up to 5 recent campaigns
         const recentCampaigns = state.campaigns.slice(0, 5);
         recentCampaigns.forEach(camp => {
-            const cRecs = state.records.filter(r => r.campaignId === camp.id);
+            const cRecs = filteredRecords.filter(r => r.campaignId === camp.id);
             const cAgg = calculateAggregates(cRecs);
             
             const totalProfit = cAgg.totalRevenue - cAgg.totalSpend;
