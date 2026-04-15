@@ -447,12 +447,16 @@ function renderCampaignDetail() {
         
         cRecs.forEach(r => {
             const rCpa = r.sales > 0 ? (r.spend / r.sales) : 0;
+            const rProfit = r.revenue - r.spend;
+            const profitColor = rProfit < 0 ? 'color: var(--accent-red)' : 'color: var(--accent-green)';
+            
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td><strong>${formatDateBR(r.date)}</strong></td>
                 <td>${formatCurrency(r.spend)}</td>
                 <td>${r.sales}</td>
                 <td style="color: var(--accent-green)">${formatCurrency(r.revenue)}</td>
+                <td style="${profitColor}; font-weight:600">${formatCurrency(rProfit)}</td>
                 <td><span class="badge ${r.roas >= 2 ? 'badge-success' : (r.roas > 1 ? 'badge-warning' : 'badge-danger')}">${r.roas.toFixed(2)}x</span></td>
                 <td>${formatCurrency(rCpa)}</td>
                 <td>
